@@ -1,0 +1,14 @@
+{
+  "name": "distort_canvas",
+  "version": "0.0.1",
+  "authors": [
+    "Patrick Kempff <patrickkempff@gmail.com>"
+  ],
+  "dependencies": {
+    "foundation": "~5.2.3"
+  },
+  "moduleType": [
+    "node"
+  ],
+  "private": true
+}

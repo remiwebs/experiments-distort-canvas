@@ -1,0 +1,27 @@
+{
+  "deploy": "deploy", 
+  "public": "deploy/public_html",
+
+  "source": {
+    "templates"  : "src/templates",
+    "js"         : "src/js", 
+    "sass"       : "src/sass", 
+    "components" : "src/components",
+    "cache"      : "src/.cache",
+    "fonts"      : "src/fonts",
+    "images"     : "src/images",
+    "videos"     : "src/videos"
+  },
+  
+  "assets": {
+    "styles"     : "assets/styles",
+    "scripts"    : "assets/scripts",
+    "images"     : "assets/images",
+    "html"       : "",
+    "fonts"      : "assets/fonts",
+    "images"     : "assets/images",
+    "videos"     : "assets/videos"
+  }, 
+
+  "bower_components": "src/components/bower"
+}

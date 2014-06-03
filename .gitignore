@@ -1,0 +1,24 @@
+
+#OSX specific
+.DS_Store
+.AppleDouble
+.LSOverride
+vendor/.git
+
+#Workflow specific
+*.sass-cache*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+#Genreated files for local development environment
+.vagrant/*
+Berksfile.lock

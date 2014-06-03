@@ -1,0 +1,10 @@
+
+
+	// Make sure the charset is set appropriately
+	@charset "UTF-8";
+
+
+	// Base functions / mixins
+	@import "../components/bower/foundation/scss/normalize", 
+			"../components/bower/foundation/scss/foundation/functions";
+

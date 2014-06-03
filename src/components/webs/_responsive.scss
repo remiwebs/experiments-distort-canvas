@@ -1,0 +1,71 @@
+// Block Breakpoints
+$display-mode-breakpoint-sizes:
+  small,
+  medium,
+  large,
+  xlarge,
+  xxlarge
+;
+$display-mode-breakpoint-only-queries:
+  unquote($small-only),
+  unquote($medium-only),
+  unquote($large-only),
+  unquote($xlarge-only),
+  unquote($xxlarge-only)
+;
+$display-mode-breakpoint-up-queries:
+  unquote($small-up),
+  unquote($medium-up),
+  unquote($large-up),
+  unquote($xlarge-up),
+  unquote($xxlarge-up)
+;
+
+// @mixin block-alignment-loop {
+// 	@each $current-block-breakpoint in $block-breakpoint-sizes {
+// 		@media #{nth($block-breakpoint-only-queries, index($block-breakpoint-sizes, $current-block-breakpoint))} {
+// 			.#{$current-block-breakpoint}-block-only {
+// 				display: block !important;
+// 			}
+//     }
+
+// 		@media #{nth($block-breakpoint-up-queries, index($block-breakpoint-sizes, $current-block-breakpoint))} {
+// 			.block-for-#{$current-block-breakpoint}-up {
+// 				display: block !important;
+// 			}
+// 		}
+		
+// 	}
+// }
+
+
+@mixin display-modes-loop {
+  $display-modes: block, inline;
+  
+  // Global display Styles
+  @each $mode in $display-modes {
+    .#{$mode} {
+      display: #{$mode} !important;
+    }
+  }
+  
+  @each $current-display-mode-breakpoint in $display-mode-breakpoint-sizes {
+    @media #{nth($display-mode-breakpoint-only-queries, index($display-mode-breakpoint-sizes, $current-display-mode-breakpoint))} {
+      @each $mode in $display-modes {
+        .#{$current-display-mode-breakpoint}-#{$mode}-only {
+          display: #{$mode} !important;
+        }
+      }
+    }
+    @media #{nth($display-mode-breakpoint-up-queries, index($display-mode-breakpoint-sizes, $current-display-mode-breakpoint))} {
+      @each $mode in $display-modes {
+        .#{$mode}-for-#{$current-display-mode-breakpoint}-up {
+          display: #{$mode} !important;
+        }
+      }
+    }
+  }
+}
+
+
+@include display-modes-loop;
