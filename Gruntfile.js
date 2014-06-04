@@ -39,46 +39,62 @@
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        concat: {
-            options: {
-                separator: ';',
-            },
-            dist: {
-                src: [
-                    '<%= paths.source.js %>/main.js'
-                ], 
-                dest: '<%= paths.source.js %>/compiled.site.js',
-            },
-        },
+        // concat: {
+        //     options: {
+        //         separator: ';',
+        //     },
+        //     dist: {
+        //         src: [
+        //             '<%= paths.source.js %>/modules/battlefield.js',
+        //             '<%= paths.source.js %>/modules/battlefield.js',
+        //             '<%= paths.source.js %>/main.js'
+        //         ], 
+        //         dest: '<%= paths.source.js %>/compiled.site.js',
+        //     },
+        // },
 
-        uglify: {
+        // uglify: {
 
-            files: {
-                '<%= paths.public %>/<%= paths.assets.scripts %>/site.min.js'  : '<%= concat.dist.dest %>',
-            },
+        //     files: {
+        //         '<%= paths.public %>/<%= paths.assets.scripts %>/site.min.js'  : '<%= concat.dist.dest %>',
+        //     },
 
-            prod: {
+        //     prod: {
+        //         options: {
+        //             mangle: false,
+        //             sourceMap: true,
+        //             sourceMapIncludeSources: true,
+        //             beautify: false,
+        //             report: 'min',
+        //             compress: true
+        //         },
+        //         files: '<%= uglify.files %>',
+        //     },
+
+        //     dev: {
+        //         options: {
+        //             mangle: false,
+        //             sourceMap: true,
+        //             sourceMapIncludeSources: true,
+        //             beautify: true,
+        //             report: 'min',
+        //             compress: false
+        //         },
+        //         files: '<%= uglify.files %>',
+        //     }
+        // },
+
+        requirejs: {
+            index: {
                 options: {
-                    mangle: false,
-                    sourceMap: true,
-                    sourceMapIncludeSources: true,
-                    beautify: false,
-                    report: 'min',
-                    compress: true
-                },
-                files: '<%= uglify.files %>',
-            },
-
-            dev: {
-                options: {
-                    mangle: false,
-                    sourceMap: true,
-                    sourceMapIncludeSources: true,
-                    beautify: true,
-                    report: 'min',
-                    compress: false
-                },
-                files: '<%= uglify.files %>',
+                    name: 'libs/almond-0.2.6',
+                    include: 'main',
+                    baseUrl: '<%= paths.source.js %>/',
+                    mainConfigFile: '<%= paths.source.js %>/main.js',
+                    out: '<%= paths.public %>/<%= paths.assets.scripts %>/main.min.js',
+                    wrap: true,
+                    optimize: 'none',
+                }
             }
         },
 
@@ -240,7 +256,7 @@
                     '<%= paths.source.js %>/**/*.js',
                     '<%= paths.source.templates %>/content.json'
                 ],
-                tasks: ['sass', 'concat', 'uglify', 'bake', 'prettify:html', 'replace:assets'],
+                tasks: ['sass', 'requirejs', 'bake', 'prettify:html', 'replace:assets'],
                 options: {
                   livereload: true,
                 },
@@ -317,9 +333,9 @@
 
 
 
-    grunt.registerTask('build', ['clean', 'copy:fonts', 'copy:videos', 'sass:prod', 'concat:dist', 'uglify:prod', 'bake:dist', 'prettify:html', 'replace:assets', 'modernizr', 'imagemin:assets']);
+    grunt.registerTask('build', ['clean', 'copy:fonts', 'copy:videos', 'sass:prod', 'requirejs', 'bake:dist', 'prettify:html', 'replace:assets', 'modernizr', 'imagemin:assets']);
 
-    grunt.registerTask('dev', ['clean', 'copy:fonts', 'copy:videos', 'sass:dev', 'concat:dist', 'uglify:dev', 'bake:dist', 'prettify:html', 'replace:assets', 'modernizr', 'imagemin:assets']);
+    grunt.registerTask('dev', ['clean', 'copy:fonts', 'copy:videos', 'sass:dev', 'requirejs', 'bake:dist', 'prettify:html', 'replace:assets', 'modernizr', 'imagemin:assets']);
     //grunt.registerTask('build', ['sass:dist', 'concat:dist', 'uglify:dist', 'bake:dist', 'replace:assets', 'modernizr']);
 
 

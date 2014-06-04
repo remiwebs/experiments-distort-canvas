@@ -8,3 +8,27 @@
 	@import "../components/bower/foundation/scss/normalize", 
 			"../components/bower/foundation/scss/foundation/functions";
 
+
+	html {
+		height: 100%;
+	}
+
+	body {
+	    margin: 0;
+	    padding: 0;
+	}
+
+	#grid, #battlefield {
+	    position: absolute;
+	    width: 100%;
+	    height: 100%;
+	    overflow: hidden;
+	}
+
+	#grid {
+		z-index:2;
+	}
+
+	#battlefield {
+		z-index:1;
+	}
