@@ -1,4 +1,4 @@
-define(['utilities/notification-center', 'utilities/context', 'utilities/collection'], function ( NotificationCenter, Context, Collection ) {
+define(['utilities/notification-center', 'utilities/context', 'utilities/collection', 'utilities/distort'], function ( NotificationCenter, Context, Collection, Distort ) {
 
     function Battlefield() {
 
@@ -11,8 +11,10 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
         this._size = {};
         this._initialized = false;
         this._tilesize = 100;
+        this._processing = false;
 
         this._image = null;
+        this._distort = null;
         this.canvas = null;
     }
 
@@ -21,14 +23,6 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 	// ----------------------------------------------------------------------------------------------------
 
     Battlefield._instance = null;
-
-    Battlefield.instance = function () {
-
-        if ( Battlefield._instance === null ) {
-            Battlefield._instance = Battlefield.make();
-        }
-        return Battlefield._instance;
-    };
 
 	// ----------------------------------------------------------------------------------------------------
 	//  Class
@@ -43,6 +37,9 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 			this.refresh();
 
 			NotificationCenter.defaultCenter().add('window.resized', this.resized, this);
+			//NotificationCenter.defaultCenter().add('points.updated', this.updated, this);
+
+			this.loaded();
 		},
 
 		refresh: function()
@@ -63,6 +60,7 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 				NotificationCenter.defaultCenter().dispatch('points.updated', this._points);
 
 				this.redraw();
+				this.updated();
 			}
 		},
 
@@ -72,24 +70,92 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 			this.redraw();
 		},
 
+		loaded: function()
+		{
+
+
+			var img = new Image();
+			img.onload = function() {
+
+				console.log('loaded!');
+
+				this._image = img;
+				//this.refresh();
+			}.bind(this);
+			img.src = '/assets/images/lincoln.jpg';
+
+
+		},
+
+		// animate: function()
+		// {
+		// 	requestAnimationFrame( this.animate );
+
+		// 	this.redraw();
+		// },
+
+		updated: function( points )
+		{
+			if ( this._image && this._points && this._processing == false )
+			{
+				this._processing = true;
+
+
+				//this._context.putImageData( this._image, 0, 0 );
+				//this._context.drawImage( this._image, 0, 0 );
+
+				Distort.apply( this._image, this._points, {width: this.canvas.width, height: this.canvas.height}, this._tilesize, function( data ){
+
+					// this._context.fillStyle = Context.randomColor();
+					// this._context.fillRect(0, 0, this._size.width, this._size.height); 
+
+					this._context.putImageData( data, 0, 0 );
+
+					this._processing = false;
+
+					//console.log(data);
+
+				}.bind(this));
+
+			}
+		},
+
 		redraw: function()
 		{
 			this.clear();
 			this.draw();
+			this.updated();
+
+			requestAnimationFrame( this.redraw.bind(this) );
 		},
 
 		draw: function()
 		{
+			//console.log( this._image );
+
+
+
+
+
+			
+			
+
+
+
 			// this._context.fillStyle = Context.randomColor();
 			// this._context.fillRect(0, 0, this._size.width, this._size.height);
 
 
 
-			requestAnimationFrame( function(){
-				this.draw();
-			}.bind(this) );
+			// distort image
+			// Distort
 
-			console.log('draw');
+
+			// requestAnimationFrame( function(){
+			// 	this.draw();
+			// }.bind(this) );
+
+			// console.log('draw');
 
 		    if ( this.animate ) {
 		    	this.docreep();	
@@ -123,8 +189,7 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 			}
 
 			this.animate = true;
-			//this.docreep();
-			//requestTick();
+
 		},
 
 		docreep: function()
@@ -132,7 +197,7 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 			this.closest_point = this.getClosestPoint( this._points, this.current_pos );
 
 
-			var points_in_range = this.getPointsInRange( this._points, this.closest_point, 500 );
+			var points_in_range = this.getPointsInRange( this._points, this.closest_point, 300 );
 			//var points_in_range = getPoints();
 
 			if ( points_in_range && points_in_range.length > 0 ) {
@@ -251,8 +316,6 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 
 		_getPoints: function()
 		{
-			console.log("get points");
-			console.log( this._size );
 
 			var result = [ ];
 			var column = 0;

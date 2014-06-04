@@ -11,10 +11,6 @@
 			paths: {
 				'signals': 'libs/signals-1.0.0'
 			}
-
-
-
-
 		}
 	);
 
@@ -26,6 +22,7 @@
 
 		var battlefield = new Battlefield();
 			battlefield.canvas = document.getElementById("battlefield");
+			//battlefield.image( "http://www.hdwallpaperspics.com/wp-content/uploads/2012/11/leopard-print-colorful-pattern-twitter-109835.jpg" );
 			battlefield.run( Viewport.getSize() );
 
 
