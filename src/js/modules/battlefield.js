@@ -16,6 +16,14 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
         this._image = null;
         this._distort = null;
         this.canvas = null;
+
+        this._is_tweening = false;
+				this._current_frame = 0;
+				this._tweening_frames = 0;
+				this._start_tweening_time = null;
+
+				this._maximum_distort_distance = 300;
+				this._tween_duration_in_seconds = 4;
     }
 
 	// ----------------------------------------------------------------------------------------------------
@@ -48,7 +56,9 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 			{
 				this._context = this.canvas.getContext("2d");
 				this._points = this._getPoints();
+				this._points = this._distortPoints();
 
+				this.initStructure();
 
 				this.canvas.setAttribute('width', this._size.width);
 				this.canvas.setAttribute('height', this._size.height);
@@ -61,6 +71,7 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 
 				this.redraw();
 				this.updated();
+
 			}
 		},
 
@@ -157,7 +168,9 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 
 			// console.log('draw');
 
-		    if ( this.animate ) {
+				if ( this._is_tweening ) {
+					this.structure();
+				} else  if ( this.animate ) {
 		    	this.docreep();	
 		    }
 		},
@@ -280,10 +293,78 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 
 		},
 
+		initStructure: function()
+		{
 
+			this._tweening_frames = 100;
 
+			this._start_tweening_time = new Date;
+			
+			this._is_tweening = true;
 
+		},
 
+		structure: function()
+		{
+
+				// Calculate the frame to load based on the time
+				var current_time = new Date;
+				var elapsed_time_in_milliseconds = current_time - this._start_tweening_time;
+				var total_time_in_milliseconds = this._tween_duration_in_seconds * 1000;
+
+				var elapsed_time_in_percentage = (100 * elapsed_time_in_milliseconds) / total_time_in_milliseconds;
+
+				var current_frame = (this._tweening_frames * elapsed_time_in_percentage) / 100;
+
+				if(current_frame <= this._tweening_frames) {
+					
+					// Calculate the points based on the current frame
+					for ( var i = 0; i < this._points.length; i++ )
+					{
+
+						if(this._points[i]['ignore_at_structure'] === false) {
+
+							// X
+							var value = this.getEaseValue(current_frame, this._points[i]['x_distorted_start'], (this._points[i]['x_distorted_difference']*-1), this._tweening_frames);
+							this._points[i]['x_end'] = value;
+
+							// Y
+							var value = this.getEaseValue(current_frame, this._points[i]['y_distorted_start'], (this._points[i]['y_distorted_difference']*-1), this._tweening_frames);
+							this._points[i]['y_end'] = value;
+
+						}
+
+					}
+
+	        NotificationCenter.defaultCenter().dispatch('points.updated', this._points);
+
+      	} else {
+
+      		// Set the points to the absolute correct final positions
+      		for ( var i = 0; i < this._points.length; i++ )
+					{
+
+	      		this._points[i]['x_end'] = this._points[i]['x'];
+	      		this._points[i]['y_end'] = this._points[i]['y'];
+
+      		}
+
+      		NotificationCenter.defaultCenter().dispatch('points.updated', this._points);
+					this._is_tweening = false;
+
+      	}
+        
+    },
+
+		getEaseValue: function(t, b, c, d)
+    {
+			 // t = current frame, b = startvalue, c = change in value, d = total frames:
+	     t /= d/2;
+	     if (t < 1) return c/2*t*t + b;
+	     t--;
+	     return -c/2 * (t*(t-2) - 1) + b;
+
+    },
 
 
 
@@ -341,6 +422,62 @@ define(['utilities/notification-center', 'utilities/context', 'utilities/collect
 			}
 
 			return result;			
+		},
+
+		// Distort points
+		_distortPoints: function()
+		{
+
+			for ( var i = 0; i < this._points.length; i++ )
+				{
+
+					// Check if the points are not outher points
+					if(
+						(this._points[i]['x'] == 0) ||
+						(this._points[i]['y'] == 0) || 
+						(this._points[i]['x'] == this._size.widht) || 
+						(this._points[i]['y'] == this._size.height)
+					) {
+
+						this._points[i]['ignore_at_structure'] = true;	
+
+					} else {
+
+						this._points[i]['ignore_at_structure'] = false;	
+
+						// Set the coordinates to the distorted positions and store the distorted positions
+						var randomNumber = Math.floor(Math.random() * 2) + 1;
+						if(randomNumber == 2) {
+							this._points[i]['x_end'] = this._points[i].x + Math.floor(Math.random() * this._maximum_distort_distance) + 1;
+						} else {
+							this._points[i]['x_end'] = this._points[i].x - Math.floor(Math.random() * this._maximum_distort_distance) + 1;
+						}
+						
+						this._points[i]['x_end'] = this._points[i]['x_end'] < 0?0:this._points[i]['x_end'];
+						this._points[i]['x_end'] = this._points[i]['x_end'] > this._size.width?this._size.width:this._points[i]['x_end'];
+						
+
+						var randomNumber = Math.floor(Math.random() * 2) + 1;
+						if(randomNumber == 2) {
+							this._points[i]['y_end'] = this._points[i].y + Math.floor(Math.random() * this._maximum_distort_distance) + 1;
+						} else {
+							this._points[i]['y_end'] = this._points[i].y - Math.floor(Math.random() * this._maximum_distort_distance) + 1;
+						}
+
+						this._points[i]['y_end'] = this._points[i]['y_end'] < 0?0:this._points[i]['y_end'];
+						this._points[i]['y_end'] = this._points[i]['y_end'] > this._size.height?this._size.height:this._points[i]['y_end'];
+						
+					}
+
+					this._points[i]['x_distorted_start'] = this._points[i]['x_end'];
+					this._points[i]['x_distorted_difference'] = this._points[i]['x_distorted_start'] - this._points[i]['x'];
+
+					this._points[i]['y_distorted_start'] = this._points[i]['y_end'];
+					this._points[i]['y_distorted_difference'] = this._points[i]['y_distorted_start'] - this._points[i]['y'];
+
+				}
+
+				return this._points;
 		},
 
 
